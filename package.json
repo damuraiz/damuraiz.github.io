@@ -1,0 +1,6 @@
+{
+  "name": "damuraiz-obolochka",
+  "private": true,
+  "scripts": {"test": "node tests/album.cjs"},
+  "devDependencies": {"playwright": "1.62.1"}
+}
