@@ -116,7 +116,7 @@
       album: album.title,
       artwork: [
         {
-          src: new URL("../assets/obolochka/cover.webp", document.baseURI).href,
+          src: new URL("/assets/obolochka/cover.webp", document.baseURI).href,
           sizes: "720x720",
           type: "image/webp",
         },

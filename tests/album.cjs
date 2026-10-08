@@ -68,7 +68,7 @@ const server = http.createServer((req, res) => {
       if (r.url().startsWith(base) && r.status() >= 400) failed.push(r.url());
     });
     await page.route("**/*googletagmanager*", (r) => r.abort());
-    await page.goto(base + "/obolochka/", { waitUntil: "networkidle" });
+    await page.goto(base + "/", { waitUntil: "networkidle" });
     await page.waitForFunction(
       () => document.querySelectorAll(".scene-image.visible").length === 1,
     );
@@ -207,7 +207,7 @@ const server = http.createServer((req, res) => {
     );
     await page.locator("#mini-play").click();
     assert.equal(await page.locator("#audio").evaluate((a) => a.paused), true);
-    await page.goto(base + "/obolochka/?track=twenty-two", { waitUntil: "networkidle" });
+    await page.goto(base + "/?track=twenty-two", { waitUntil: "networkidle" });
     assert.equal(
       await page.locator("#player-title").innerText(),
       "Я умер в двадцать втором",
@@ -231,7 +231,7 @@ const server = http.createServer((req, res) => {
     }
     for (let i = 0; i < 4; i++) {
       const id = ["new-oil", "loyalty", "twenty-two", "tomorrow"][i];
-      await page.goto(base + "/obolochka/?track=" + id, { waitUntil: "networkidle" });
+      await page.goto(base + "/?track=" + id, { waitUntil: "networkidle" });
       for (const platform of ["youtube", "instagram", "tiktok"]) {
         const expected = await page.evaluate(({ platform, id }) => window.ALBUM_LINKS[platform + "Tracks"][id], { platform, id });
         assert.equal(await page.locator("#track-" + platform).getAttribute("href"), expected);
@@ -241,15 +241,28 @@ const server = http.createServer((req, res) => {
         await page.setViewportSize({ width, height: 844 });
         assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, id + " overflow at " + width);
         if (width === 390 || width === 1440) {
-          await page.goto(base + "/obolochka/?track=" + id, { waitUntil: "networkidle" });
+          await page.goto(base + "/?track=" + id, { waitUntil: "networkidle" });
           await page.waitForFunction((id) => document.querySelector(".scene-image.visible").getAttribute("src").includes(id + ".webp"), id);
           await page.screenshot({ path: path.join(root, "docs/preview/" + id + "-" + width + ".jpg"), type: "jpeg", quality: 85 });
         }
       }
     }
-    await page.goto(base + "/", { waitUntil: "networkidle" });
-    assert.equal(await page.locator("h1").innerText(), "НОВАЯ\nНЕФТЬ.");
-    assert.equal(await page.locator(".tracklist").count(), 0);
+    // Both entry points share the approved album and the same resources.
+    assert.equal(fs.readFileSync(path.join(root, "index.html"), "utf8"), fs.readFileSync(path.join(root, "obolochka/index.html"), "utf8"));
+    for (const entry of ["/", "/obolochka/"]) {
+      await page.goto(base + entry + "?track=loyalty", { waitUntil: "networkidle" });
+      assert.equal(await page.locator("h1").innerText(), "ОБОЛОЧКА.");
+      assert.equal(await page.locator(".tracklist li").count(), 4);
+      assert.equal(await page.locator(".album-line").innerText(), "Все что осталось");
+      assert.equal(await page.locator("#about-title").innerText(), "Найти\nсебя.");
+      assert.equal(await page.locator("link[rel=canonical]").getAttribute("href"), "https://damuraiz.com/");
+      assert.equal(await page.locator("script[src*=googletagmanager]").getAttribute("src"), "https://www.googletagmanager.com/gtag/js?id=G-4GMCCWMFBV");
+      assert.equal(await page.locator("#player-title").innerText(), "Награда за верность");
+      assert.equal(await page.locator(".archive-link").getAttribute("href"), "/new-oil/");
+      await page.locator("#hero-play").click();
+      await page.waitForFunction(() => document.querySelector("#audio").currentTime > 0.1);
+      await page.locator("#play").click();
+    }
     await page.goto(base + "/new-oil/", { waitUntil: "networkidle" });
     assert.equal(await page.locator("h1").innerText(), "НОВАЯ\nНЕФТЬ.");
     await page.locator("#hero-play").click();
@@ -264,7 +277,7 @@ const server = http.createServer((req, res) => {
       viewport: { width: 390, height: 844 },
     });
     await noJS.route("**/*googletagmanager*", (r) => r.abort());
-    await noJS.goto(base + "/obolochka/");
+    await noJS.goto(base + "/");
     assert.equal(await noJS.locator(".lyric-panel:visible").count(), 4);
     assert.equal(await noJS.locator("noscript audio").count(), 4);
     assert.equal(
@@ -274,7 +287,7 @@ const server = http.createServer((req, res) => {
       false,
     );
     console.log(
-      "PASS: real playback of 4 MP3s, seeking, pause, previous/next, sequential ending, repeat, restart, rapid switching, independent lyrics, mini player, deep links, 4 screen widths, unchanged homepage, archive, track platform links and no-JS fallback.",
+      "PASS: real playback of 4 MP3s, seeking, pause, previous/next, sequential ending, repeat, restart, rapid switching, independent lyrics, mini player, deep links, 4 screen widths, album homepage and previous URL, analytics, archive, track platform links and no-JS fallback.",
     );
   } finally {
     await browser.close();
