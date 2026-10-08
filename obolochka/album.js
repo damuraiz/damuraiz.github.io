@@ -116,7 +116,7 @@
       album: album.title,
       artwork: [
         {
-          src: new URL("assets/obolochka/cover.webp", document.baseURI).href,
+          src: new URL("../assets/obolochka/cover.webp", document.baseURI).href,
           sizes: "720x720",
           type: "image/webp",
         },
@@ -133,9 +133,13 @@
       `${String(selected + 1).padStart(2, "0")} / 04`;
     $("scene-quote").textContent = track.quote;
     $("track-spotify").href = `https://open.spotify.com/track/${track.spotify}`;
-    const youtube = window.ALBUM_LINKS?.youtubeTracks?.[track.id];
-    $("track-youtube").hidden = !youtube;
-    if (youtube) $("track-youtube").href = youtube;
+    for (const platform of ["youtube", "instagram", "tiktok"]) {
+      const link = $(`track-${platform}`);
+      const url = window.ALBUM_LINKS?.[`${platform}Tracks`]?.[track.id];
+      link.hidden = !url;
+      if (url) link.href = url;
+      else link.removeAttribute("href");
+    }
     document.querySelectorAll("[data-track]").forEach((row, i) => {
       const isSelected = i === selected;
       row.classList.toggle("selected", isSelected);

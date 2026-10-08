@@ -7,12 +7,12 @@ window.ALBUM = {
       id: "new-oil",
       title: "Новая нефть",
       duration: 194.04,
-      audio: "assets/new-oil.mp3",
+      audio: "../assets/new-oil.mp3",
       accent: "#eea46b",
       mood: "Хроника конца света",
       quote: "Мы так заебались\nпри жизни гореть.",
       scene:
-        "Огонь, руины и метеорит над городом. Damuraiz в полевой куртке среди обломков.",
+        "Damuraiz и чумные доктора в чёрных масках среди горящих руин. Над городом летит метеорит.",
       spotify: "0qlAgzLyXei61QmhAbUcWX",
       sections: [
         {
@@ -87,18 +87,18 @@ window.ALBUM = {
           ],
         },
       ],
-      art: "assets/obolochka/new-oil.webp",
+      art: "../assets/obolochka/new-oil.webp",
     },
     {
       id: "loyalty",
       title: "Награда за верность",
       duration: 165.624,
-      audio: "assets/obolochka/loyalty.mp3",
+      audio: "../assets/obolochka/loyalty.mp3",
       accent: "#f0c94f",
       mood: "Урок окончен",
       quote: "А кто нашим детям\nих завтра вернёт?",
       scene:
-        "Damuraiz на жёлтой промышленной лестнице. Внизу пустой школьный коридор и урна для голосования.",
+        "Damuraiz показывает средний палец на жёлтой промышленной лестнице. Внизу — урна для голосования.",
       spotify: "5S9xwlI2YsWZbGoVoOyzDS",
       sections: [
         {
@@ -150,13 +150,13 @@ window.ALBUM = {
           paragraphs: ["Урок окончен.\nГорите в аду"],
         },
       ],
-      art: "assets/obolochka/loyalty.webp",
+      art: "../assets/obolochka/loyalty.webp",
     },
     {
       id: "twenty-two",
       title: "Я умер в двадцать втором",
       duration: 243.192,
-      audio: "assets/obolochka/twenty-two.mp3",
+      audio: "../assets/obolochka/twenty-two.mp3",
       accent: "#a9c9e4",
       mood: "Тело не в курсе",
       quote: "Мне есть ещё куда идти.\nМне некуда больше вернуться.",
@@ -225,13 +225,13 @@ window.ALBUM = {
           ],
         },
       ],
-      art: "assets/obolochka/twenty-two.webp",
+      art: "../assets/obolochka/twenty-two.webp",
     },
     {
       id: "tomorrow",
       title: "До завтра",
       duration: 219.96,
-      audio: "assets/obolochka/tomorrow.mp3",
+      audio: "../assets/obolochka/tomorrow.mp3",
       accent: "#e79878",
       mood: "Ещё раз обнять",
       quote: "Там даже чужие\nвдруг стали своими.",
@@ -303,7 +303,7 @@ window.ALBUM = {
           paragraphs: ["В случае ядерной войны мы не все умрем\nДо завтра."],
         },
       ],
-      art: "assets/obolochka/tomorrow.webp",
+      art: "../assets/obolochka/tomorrow.webp",
     },
   ],
 };
