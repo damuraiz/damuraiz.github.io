@@ -347,6 +347,10 @@
     if (url) link.href = url;
   });
   document.documentElement.classList.add("js");
+  document.querySelectorAll("[data-music-video]").forEach((link) => {
+    const url = window.ALBUM_LINKS?.musicVideos?.[link.dataset.musicVideo];
+    if (url) link.href = url;
+  });
   const initial = tracks.findIndex(
     (track) => track.id === new URLSearchParams(location.search).get("track"),
   );
