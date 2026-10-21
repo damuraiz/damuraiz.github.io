@@ -255,9 +255,13 @@ h1 {
 }
 .hero-platforms {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 24px;
   font-size: 12px;
+}
+.hero-platforms > a {
+  white-space: nowrap;
 }
 .hero-clip {
   display: inline-flex;

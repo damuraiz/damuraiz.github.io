@@ -1,4 +1,11 @@
 window.ALBUM_LINKS = {
+  yandex: "https://music.yandex.com/album/44401324",
+  yandexTracks: {
+    "new-oil": "https://music.yandex.com/album/44401324/track/156956189",
+    loyalty: "https://music.yandex.com/album/44401324/track/156956190",
+    "twenty-two": "https://music.yandex.com/album/44401324/track/156956191",
+    tomorrow: "https://music.yandex.com/album/44401324/track/156956192",
+  },
   spotify: "https://open.spotify.com/album/0JcyuDPMUlan0iaucR8rIi",
   youtube:
     "https://www.youtube.com/playlist?list=OLAK5uy_l7d8zjxZhH4Rj-6Pc1BM22qLQWYLYnsYU",
