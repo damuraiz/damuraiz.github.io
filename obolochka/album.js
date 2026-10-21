@@ -133,7 +133,7 @@
       `${String(selected + 1).padStart(2, "0")} / 04`;
     $("scene-quote").textContent = track.quote;
     $("track-spotify").href = `https://open.spotify.com/track/${track.spotify}`;
-    for (const platform of ["youtube", "instagram", "tiktok"]) {
+    for (const platform of ["yandex", "youtube", "instagram", "tiktok"]) {
       const link = $(`track-${platform}`);
       const url = window.ALBUM_LINKS?.[`${platform}Tracks`]?.[track.id];
       link.hidden = !url;
