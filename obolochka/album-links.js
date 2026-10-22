@@ -1,4 +1,11 @@
 window.ALBUM_LINKS = {
+  vk: "https://vk.ru/music/album/-2000594054_29594054_814c47bc0b912570bf",
+  vkTracks: {
+    "new-oil": "https://vk.ru/audio-2001576373_155576373",
+    loyalty: "https://vk.ru/audio-2001576372_155576372",
+    "twenty-two": "https://vk.ru/audio-2001576371_155576371",
+    tomorrow: "https://vk.ru/audio-2001576370_155576370",
+  },
   yandex: "https://music.yandex.com/album/44401324",
   yandexTracks: {
     "new-oil": "https://music.yandex.com/album/44401324/track/156956189",

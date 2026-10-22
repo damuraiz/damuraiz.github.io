@@ -232,7 +232,7 @@ const server = http.createServer((req, res) => {
     for (let i = 0; i < 4; i++) {
       const id = ["new-oil", "loyalty", "twenty-two", "tomorrow"][i];
       await page.goto(base + "/?track=" + id, { waitUntil: "networkidle" });
-      for (const platform of ["yandex", "youtube", "instagram", "tiktok"]) {
+      for (const platform of ["youtube", "yandex", "vk", "instagram", "tiktok"]) {
         const expected = await page.evaluate(({ platform, id }) => window.ALBUM_LINKS[platform + "Tracks"][id], { platform, id });
         assert.equal(await page.locator("#track-" + platform).getAttribute("href"), expected);
         assert.equal(await page.locator("#track-" + platform).isVisible(), true);
