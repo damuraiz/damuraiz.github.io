@@ -1,0 +1,9 @@
+/* Release-specific framing; shared typography and lyric colors remain unchanged. */
+.hero{display:grid;grid-template-columns:1fr 1fr;gap:36px;align-items:center;min-height:0;padding-top:140px;background:radial-gradient(ellipse at 85% 35%,#112b43,transparent 65%)}
+.hero-art{position:relative;inset:auto;z-index:0;grid-column:2;grid-row:1;align-self:center;border:1px solid #ffffff30;box-shadow:0 24px 90px #0008;transform:rotate(1deg)}
+.hero-art img{display:block;width:100%;height:auto;object-fit:contain}.hero-art:after{display:none}
+.hero-copy{grid-column:1;grid-row:1;max-width:none}h1{font-size:clamp(64px,7.8vw,118px)}.hero-side{display:none}.player{grid-column:1/-1;margin-top:10px;width:100%}.player audio{display:none}.player:has(audio:only-child) audio{display:block}
+.lyrics-section{scroll-margin-top:30px}.hero-quote{max-width:30ch}.primary:hover{color:#090b09}
+@media(max-width:800px){.hero{grid-template-columns:1fr;padding:120px 6% 30px;gap:30px}.hero-copy{grid-column:1;grid-row:1}.hero-art{grid-column:1;grid-row:2;width:100%;max-width:580px;margin:auto;transform:none}.hero h1{font-size:clamp(64px,14vw,108px);margin-top:20px}.player{grid-row:3;grid-column:1}.hero-art img{min-height:0}.hero-actions .button{flex:1 1 auto}.hero-quote{font-size:19px}.release-meta{gap:12px;flex-wrap:wrap}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.hazard>div{animation:none}}
+.hero-art{height:auto}.hero-art img{aspect-ratio:1}.hero-copy,.track{min-width:0}.player-title{min-width:0}.player-title strong{overflow-wrap:anywhere}
