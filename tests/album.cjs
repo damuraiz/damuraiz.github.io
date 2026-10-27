@@ -9,6 +9,7 @@ const mime = {
   ".css": "text/css",
   ".js": "text/javascript",
   ".webp": "image/webp",
+  ".jpg": "image/jpeg",
   ".svg": "image/svg+xml",
   ".woff": "font/woff",
   ".mp3": "audio/mpeg",
@@ -55,6 +56,7 @@ const server = http.createServer((req, res) => {
   const base = `http://127.0.0.1:${server.address().port}`;
   const browser = await chromium.launch({
     headless: true,
+    executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || undefined,
     args: ["--no-sandbox"],
   });
   try {
@@ -68,7 +70,7 @@ const server = http.createServer((req, res) => {
       if (r.url().startsWith(base) && r.status() >= 400) failed.push(r.url());
     });
     await page.route("**/*googletagmanager*", (r) => r.abort());
-    await page.goto(base + "/", { waitUntil: "networkidle" });
+    await page.goto(base + "/obolochka/", { waitUntil: "networkidle" });
     await page.waitForFunction(
       () => document.querySelectorAll(".scene-image.visible").length === 1,
     );
@@ -247,18 +249,17 @@ const server = http.createServer((req, res) => {
         }
       }
     }
-    // Both entry points share the approved album and the same resources.
-    assert.equal(fs.readFileSync(path.join(root, "index.html"), "utf8"), fs.readFileSync(path.join(root, "obolochka/index.html"), "utf8"));
+    // Shared album track URLs still reach the dedicated album page.
     for (const entry of ["/", "/obolochka/"]) {
       await page.goto(base + entry + "?track=loyalty", { waitUntil: "networkidle" });
       assert.equal(await page.locator("h1").innerText(), "ОБОЛОЧКА.");
       assert.equal(await page.locator(".tracklist li").count(), 4);
       assert.equal(await page.locator(".album-line").innerText(), "Все что осталось");
       assert.equal(await page.locator("#about-title").innerText(), "Найти\nсебя.");
-      assert.equal(await page.locator("link[rel=canonical]").getAttribute("href"), "https://damuraiz.com/");
+      assert.equal(await page.locator("link[rel=canonical]").getAttribute("href"), "https://damuraiz.com/obolochka/");
       assert.equal(await page.locator("script[src*=googletagmanager]").getAttribute("src"), "https://www.googletagmanager.com/gtag/js?id=G-4GMCCWMFBV");
       assert.equal(await page.locator("#player-title").innerText(), "Награда за верность");
-      assert.equal(await page.locator(".archive-link").getAttribute("href"), "/new-oil/");
+      assert.equal(await page.locator(".archive-link").last().getAttribute("href"), "/new-oil/");
       await page.locator("#hero-play").click();
       await page.waitForFunction(() => document.querySelector("#audio").currentTime > 0.1);
       await page.locator("#play").click();
@@ -277,7 +278,7 @@ const server = http.createServer((req, res) => {
       viewport: { width: 390, height: 844 },
     });
     await noJS.route("**/*googletagmanager*", (r) => r.abort());
-    await noJS.goto(base + "/");
+    await noJS.goto(base + "/obolochka/");
     assert.equal(await noJS.locator(".lyric-panel:visible").count(), 4);
     assert.equal(await noJS.locator("noscript audio").count(), 4);
     assert.equal(
@@ -286,8 +287,61 @@ const server = http.createServer((req, res) => {
       ),
       false,
     );
+    await noJS.close();
+    const single = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+    single.on("pageerror", (e) => errors.push(e.message));
+    single.on("response", (r) => {
+      if (r.url().startsWith(base) && r.status() >= 400) failed.push(r.url());
+    });
+    await single.route("**/*googletagmanager*", (r) => r.abort());
+    for (const entry of ["/", "/gorit-nash-dom/"]) {
+      await single.goto(base + entry, { waitUntil: "networkidle" });
+      assert.equal(await single.locator("h1").innerText(), "ГОРИТ\nНАШ ДОМ.");
+      assert.equal(await single.locator("audio").count(), 1);
+      assert.equal(await single.locator('a[href$=".m4a"]').count(), 0);
+      assert.equal(await single.locator(".single-verses .verse").count(), 8);
+      assert.equal(await single.locator("link[rel=canonical]").getAttribute("href"), "https://damuraiz.com" + entry);
+      await single.locator("#single-play").click();
+      await single.waitForFunction(() => document.getElementById("single-audio").currentTime > 0.1);
+      await single.locator("#single-play").click();
+      assert.equal(await single.locator("#single-audio").evaluate((a) => a.paused), true);
+      await single.locator("#single-seek").evaluate((input) => { input.value = "35"; input.dispatchEvent(new Event("input")); });
+      await single.waitForFunction(() => Math.floor(document.getElementById("single-audio").currentTime) === 35);
+      await single.locator("#single-play").click();
+      await single.locator("#single-audio").evaluate((a) => { a.currentTime = a.duration - 0.15; });
+      await single.waitForFunction(() => document.getElementById("single-audio").ended);
+      assert.equal(await single.locator("#single-play [data-play-label]").innerText(), "Слушать ещё раз");
+      await single.locator("#single-play").click();
+      await single.waitForFunction(() => document.getElementById("single-audio").currentTime > 0.1 && !document.getElementById("single-audio").ended);
+      await single.locator("#lyrics").scrollIntoViewIfNeeded();
+      await single.waitForFunction(() => !document.getElementById("single-mini").hidden);
+      await single.locator("#single-mini-play").click();
+      assert.equal(await single.locator("#single-audio").evaluate((a) => a.paused), true);
+      await single.locator(".release-link").click();
+      await single.waitForURL("**/obolochka/");
+      assert.equal(await single.locator(".tracklist li").count(), 4);
+    }
+    await single.goto(base + "/", { waitUntil: "networkidle" });
+    for (const width of [320, 390, 768, 1050, 1440]) {
+      await single.setViewportSize({ width, height: 1000 });
+      await single.evaluate(() => scrollTo(0, 0));
+      assert.equal(await single.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, "single overflow at " + width);
+      if (width === 390 || width === 1440) await single.screenshot({ path: path.join(root, `docs/preview/single-${width}.jpg`), type: "jpeg", quality: 85 });
+    }
+    const download = await single.request.get(base + "/assets/gorit-nash-dom/track.mp3");
+    assert.equal(download.status(), 200);
+    assert.equal((await download.body()).length, 8898445);
+    const fallback = await browser.newPage({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
+    await fallback.route("**/*googletagmanager*", (r) => r.abort());
+    await fallback.goto(base + "/gorit-nash-dom/");
+    assert.equal(await fallback.locator("audio[controls]").isVisible(), true);
+    assert.equal(await fallback.locator("#single-play").isVisible(), false);
+    assert.equal(await fallback.locator(".single-verses .verse").count(), 8);
+    assert.deepEqual(errors, [], "browser errors, including single");
+    assert.deepEqual(failed, [], "missing assets, including single");
+    console.log("PASS: single playback, pause, seek, end/restart, mini player, album navigation, MP3 download, no M4A links, 5 widths and no-JS controls.");
     console.log(
-      "PASS: real playback of 4 MP3s, seeking, pause, previous/next, sequential ending, repeat, restart, rapid switching, independent lyrics, mini player, deep links, 4 screen widths, album homepage and previous URL, analytics, archive, track platform links and no-JS fallback.",
+      "PASS: real playback of 4 MP3s, seeking, pause, previous/next, sequential ending, repeat, restart, rapid switching, independent lyrics, mini player, deep links, 4 screen widths, dedicated album and legacy track URLs, analytics, archive, track platform links and no-JS fallback.",
     );
   } finally {
     await browser.close();
